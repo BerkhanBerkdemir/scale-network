@@ -628,14 +628,24 @@ def generatekeaconfig(servers, aps, vlans, outputdir):
         f.write(json.dumps(keav6_config, indent=2))
 
 
-def generatepromconfig(servers, aps, vlans, outputdir):
-    prom_config = [
+def generatepromconfig(servers, aps, pis, outputdir):
+    ap_targets = [
         {
             "targets": [ap["ipv4"] + ":9100"],
             "labels": {"ap": ap["name"]},
         }
         for ap in aps
     ]
+
+    pi_targets = [
+        {
+            "targets": ["["+ pi["ipv6"] + "]" + ":9100"],
+            "labels": {"pi": pi["name"]},
+        }
+        for pi in pis
+    ]
+
+    prom_config = ap_targets + pi_targets
 
     with open(f"{outputdir}/prom.json", "w") as f:
         f.write(json.dumps(prom_config, indent=2))
@@ -734,13 +744,13 @@ def main():
     elif subcomm == "nsd":
         generatezones(switches, routers, pis, aps, servers, outputdir)
     elif subcomm == "prom":
-        generatepromconfig(servers, aps, vlans, outputdir)
+        generatepromconfig(servers, aps, pis, outputdir)
     elif subcomm == "wasgeht":
         generatewasgehtconfig(switches, routers, pis, aps, servers, outputdir)
     elif subcomm == "all":
         generatekeaconfig(servers, aps, vlans, outputdir)
         generatezones(switches, routers, pis, aps, servers, outputdir)
-        generatepromconfig(servers, aps, vlans, outputdir)
+        generatepromconfig(servers, aps, pis, outputdir)
         generatewasgehtconfig(switches, routers, pis, aps, servers, outputdir)
     elif subcomm == "debug":
         # overload outputdir as 2nd debug parameter
