@@ -58,6 +58,56 @@ in
             builtins.readFile "${pkgs.scale-network.scaleInventory}/config/prom.json"
           );
         }
+        {
+          job_name = "snmp";
+          static_configs = [
+            {
+              targets = [ '[2001:470:f325:103::2]' ];
+              labels = {
+                name = "br-mdf-01";
+              };
+            }
+            {
+              targets = [ '[2001:470:f325:103::1]' ];
+              labels = {
+                name = "ex-mdf-01";
+              };
+            }
+            {
+              targets = [ '[2001:470:f325:503::1]' ];
+              labels = {
+                name = "cf-mdf-01";
+              };
+            }
+          ]
+          metrics_path = '/snmp';
+          params = {
+            auth = [ 'junitux' ];
+            module = [ 'junos_bandwidth' ];
+          }
+          relabel_configs = [
+            {
+              source_labels = ['__address__'];
+              target_label = __param_target;
+            }
+            {
+              source_labels = ['__param_target'];
+              target_label = 'instance';
+            }
+            {
+              target_label = '__address__';
+              replacement: '127.0.0.1:9116';
+            }
+          ]
+        }
+        {
+          job_name = 'snmp_exporter';
+          static_configs = {
+            targets = [
+              'localhost:9116'
+            ];
+          }
+        }
       ];
 
       grafana.enable = mkDefault true;
