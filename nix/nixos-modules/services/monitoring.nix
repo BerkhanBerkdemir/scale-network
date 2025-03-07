@@ -132,6 +132,10 @@ in
             name = "openwrt";
             options.path = ../../../monitoring/openwrt_dashboard.json;
           }
+          {
+            name = "aphealth";
+            options.path = ../../../monitoring/ap_health_dashboard.json;
+          }
         ];
       };
 
