@@ -33,5 +33,13 @@ in
           "textfile"
         ];
       };
+
+      services.prometheus.exporters.snmp ={
+        enable = true;
+        #
+        # TODO: Use configurationPath since we are using ./snmp.yml
+        #   https://mynixos.com/nixpkgs/option/services.prometheus.exporters.snmp.configurationPath
+        #
+      }
     };
 }
